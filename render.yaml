@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: vending-machine
+    runtime: python
+    plan: free
+    buildCommand: bash build.sh
+    startCommand: gunicorn vending_site.wsgi:application
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.4
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DATABASE_URL
+        sync: false

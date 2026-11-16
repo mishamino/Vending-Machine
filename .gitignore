@@ -1,10 +1,8 @@
-<<<<<<< HEAD
 .venv/
 venv/
 __pycache__/
 *.py[cod]
 staticfiles/
-=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -68,6 +66,8 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+db.sqlite3.backup
+vending-data.json
 
 # Flask stuff:
 instance/
@@ -225,4 +225,3 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
->>>>>>> b55ac273f724964844e54ce66f8e0c94a9809c92

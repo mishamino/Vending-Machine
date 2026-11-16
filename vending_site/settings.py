@@ -1,25 +1,39 @@
 import os
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+
+import dj_database_url
 
 from django.core.exceptions import ImproperlyConfigured
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "django-insecure-local-development-only-change-before-hosting",
-)
-DEBUG = os.environ.get("DJANGO_DEBUG", "1").lower() in {"1", "true", "yes"}
-if not DEBUG and not os.environ.get("DJANGO_SECRET_KEY"):
+secret_key = os.environ.get("DJANGO_SECRET_KEY", "").strip()
+DEBUG = os.environ.get("DJANGO_DEBUG", "1").strip().lower() in {
+    "1",
+    "true",
+    "yes",
+}
+if not DEBUG and not secret_key:
     raise ImproperlyConfigured(
         "Set DJANGO_SECRET_KEY in the hosting environment before production."
     )
-ALLOWED_HOSTS = [
+SECRET_KEY = secret_key or "django-insecure-local-development-only-change-before-hosting"
+ALLOWED_HOSTS = {
     host.strip()
-    for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+    for host in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost"
+    ).split(",")
     if host.strip()
+}
+render_hostname = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "").strip()
+if render_hostname:
+    ALLOWED_HOSTS.add(render_hostname)
+ALLOWED_HOSTS = sorted(ALLOWED_HOSTS)
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip().rstrip("/")
+    for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
 ]
 
 INSTALLED_APPS = [
@@ -34,6 +48,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -41,6 +56,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 
 ROOT_URLCONF = "vending_site.urls"
 
@@ -63,21 +84,13 @@ WSGI_APPLICATION = "vending_site.wsgi.application"
 
 database_url = os.environ.get("DATABASE_URL", "").strip()
 if database_url:
-    parsed_database_url = urlparse(database_url)
-    if parsed_database_url.scheme != "mysql":
-        raise ValueError("DATABASE_URL must start with mysql:// for online MySQL.")
-    if not parsed_database_url.hostname or not parsed_database_url.path.strip("/"):
-        raise ValueError("DATABASE_URL must include a MySQL host and database name.")
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": unquote(parsed_database_url.path.lstrip("/")),
-            "USER": unquote(parsed_database_url.username or ""),
-            "PASSWORD": unquote(parsed_database_url.password or ""),
-            "HOST": parsed_database_url.hostname,
-            "PORT": str(parsed_database_url.port or 3306),
-            "OPTIONS": {"charset": "utf8mb4"},
-        }
+        "default": dj_database_url.parse(
+            database_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=not DEBUG,
+        )
     }
 else:
     local_database = Path(
@@ -98,13 +111,21 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = os.environ.get("VENDING_TIMEZONE", "Mauritius")
+TIME_ZONE = os.environ.get("VENDING_TIMEZONE", "Indian/Mauritius")
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "admin_login"
