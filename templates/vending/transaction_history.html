@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body class="admin-body">
+    <header class="admin-topbar">
+        <div>
+            <p class="tiny-label">VENDING MACHINE ADMIN</p>
+            <h1>Transaction history</h1>
+        </div>
+        <nav class="admin-actions" aria-label="Admin navigation">
+            <a class="history-button" href="{% url 'admin_dashboard' %}">BACK TO INVENTORY</a>
+            <form method="post" action="{% url 'admin_logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-button">LOG OUT</button>
+            </form>
+        </nav>
+    </header>
+
+    <main class="admin-layout">
+        <section class="admin-card transaction-panel">
+            <div class="panel-header-row">
+                <div>
+                    <h2>All transactions</h2>
+                    <span class="small-text">{{ transactions_page.paginator.count }} total · newest first</span>
+                </div>
+            </div>
+
+            <div class="inventory-table-wrap">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction</th>
+                            <th>Date / time</th>
+                            <th>Items</th>
+                            <th>Inserted</th>
+                            <th>Paid</th>
+                            <th>Change</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions_page %}
+                        <tr>
+                            <td>#{{ transaction.transaction_id }}</td>
+                            <td>{{ transaction.transaction_date|date:"M j, Y" }}<br>{{ transaction.transaction_time|time:"H:i" }}</td>
+                            <td>
+                                <ul class="transaction-items">
+                                    {% for item in transaction.items.all %}
+                                    <li>{{ item.quantity }} × {{ item.product.name }} <span>(Rs {{ item.unit_price_display }} each)</span></li>
+                                    {% empty %}
+                                    <li>No items purchased</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>Rs {{ transaction.total_inserted_display }}</td>
+                            <td>Rs {{ transaction.total_purchase_display }}</td>
+                            <td>Rs {{ transaction.change_returned_display }}</td>
+                            <td><span class="status transaction-{{ transaction.status }}">{{ transaction.get_status_display }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7">No transactions have been recorded yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if transactions_page.has_other_pages %}
+            <nav class="transaction-pagination" aria-label="Transaction history pages">
+                {% if transactions_page.has_previous %}
+                    <a href="?transactions_page={{ transactions_page.previous_page_number }}">Previous</a>
+                {% endif %}
+                <span>Page {{ transactions_page.number }} of {{ transactions_page.paginator.num_pages }}</span>
+                {% if transactions_page.has_next %}
+                    <a href="?transactions_page={{ transactions_page.next_page_number }}">Next</a>
+                {% endif %}
+            </nav>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

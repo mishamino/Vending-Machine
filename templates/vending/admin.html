@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Inventory</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body class="admin-body">
+    <header class="admin-topbar">
+        <div>
+            <p class="tiny-label">VENDING MACHINE ADMIN</p>
+            <h1>Inventory management</h1>
+        </div>
+        <nav class="admin-actions" aria-label="Admin navigation">
+            <a class="history-button" href="{% url 'admin_transaction_history' %}">TRANSACTION HISTORY</a>
+            <form method="post" action="{% url 'admin_logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-button">LOG OUT</button>
+            </form>
+        </nav>
+    </header>
+
+    {% if messages %}
+        <div class="flash-wrapper">
+            {% for message in messages %}
+                <div class="flash {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main class="admin-layout">
+        <section class="admin-card add-product-panel">
+            <h2>Add new product</h2>
+            <form method="post" action="{% url 'add_product' %}">
+                {% csrf_token %}
+                <div class="form-grid">
+                    <label>
+                        <span>Product ID</span>
+                        <input type="text" name="product_id" placeholder="22" pattern="[0-9]{2}" maxlength="2" required>
+                    </label>
+                    <label>
+                        <span>Product name</span>
+                        <input type="text" name="name" placeholder="Monster Energy" required>
+                    </label>
+                    <label>
+                        <span>Category</span>
+                        <input type="text" name="category" placeholder="Energy drinks" required>
+                    </label>
+                    <label>
+                        <span>Price</span>
+                        <input type="number" name="price" min="0" step="1" placeholder="65" required>
+                    </label>
+                    <label>
+                        <span>Image file</span>
+                        <input type="text" name="image" placeholder="images/products/monster.png" required>
+                    </label>
+                    <label>
+                        <span>Starting stock</span>
+                        <input type="number" name="quantity" min="0" step="1" value="0" required>
+                    </label>
+                </div>
+                <button type="submit" class="primary-button">ADD PRODUCT</button>
+            </form>
+        </section>
+
+        <section class="admin-card inventory-panel">
+            <div class="panel-header-row">
+                <h2>Current inventory</h2>
+                <span class="small-text">Low stock threshold: 5</span>
+            </div>
+
+            <div class="inventory-table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>Name</th><th>Category</th><th>Price</th>
+                            <th>Stock</th><th>Status</th><th>Image</th><th>Active</th>
+                            <th>Update</th><th>Restock</th><th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>
+                                {{ product.product_id }}
+                                <form id="update-{{ product.product_id }}" method="post"
+                                      action="{% url 'update_product' product_id=product.product_id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                                </form>
+                            </td>
+                            <td><input form="update-{{ product.product_id }}" type="text" name="name" value="{{ product.name }}" maxlength="100" required></td>
+                            <td><input form="update-{{ product.product_id }}" type="text" name="category" value="{{ product.category }}" maxlength="80" required></td>
+                            <td><input form="update-{{ product.product_id }}" type="number" name="price" min="0" step="1" value="{{ product.price_whole_rupees }}" required></td>
+                            <td><input form="update-{{ product.product_id }}" type="number" name="quantity" min="0" step="1" value="{{ product.quantity }}" required></td>
+                            <td>
+                                {% if not product.is_active %}
+                                    <span class="status discontinued">DISCONTINUED</span>
+                                {% elif product.quantity == 0 %}
+                                    <span class="status soldout">SOLD OUT</span>
+                                {% elif product.quantity <= 5 %}
+                                    <span class="status low">LOW STOCK</span>
+                                {% else %}
+                                    <span class="status in-stock">IN STOCK</span>
+                                {% endif %}
+                            </td>
+                            <td><input form="update-{{ product.product_id }}" type="text" name="image" value="{{ product.image }}" maxlength="255" required></td>
+                            <td>
+                                <label class="checkbox-wrap">
+                                    <input form="update-{{ product.product_id }}" type="checkbox" name="is_active" value="1" {% if product.is_active %}checked{% endif %}>
+                                    <span>Visible</span>
+                                </label>
+                            </td>
+                            <td><button form="update-{{ product.product_id }}" type="submit" class="table-button update-btn">SAVE</button></td>
+                            <td>
+                                <form method="post" action="{% url 'restock_product' product_id=product.product_id %}">
+                                    {% csrf_token %}
+                                    <div class="restock-box">
+                                        <input type="number" name="quantity_to_add" min="1" step="1" value="20" required>
+                                        <button type="submit" class="table-button restock-btn">RESTOCK</button>
+                                    </div>
+                                </form>
+                            </td>
+                            <td>
+                                <form method="post" action="{% url 'delete_product' product_id=product.product_id %}" class="delete-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="table-button delete-btn">DELETE</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="11">No products yet. Import the existing database to load the vending-machine products.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="{% static 'js/admin.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Physical vending machine simulation">
+    <title>Vending Machine Simulator</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header class="machine-header">
+        <div class="machine-brand">
+            <span class="brand-light" aria-hidden="true"></span>
+            <span>VENDING MACHINE</span>
+            <span class="header-divider">/</span>
+            <span class="header-subtitle">STUDENT REFRESHMENTS</span>
+        </div>
+        <span class="machine-status"><span class="status-light"></span> SYSTEM READY</span>
+    </header>
+
+    <main class="machine-layout">
+        <section class="display-cabinet" aria-labelledby="stock-heading">
+            <div class="cabinet-heading">
+                <div>
+                    <p class="panel-label">PRODUCT DISPLAY</p>
+                    <h1 id="stock-heading">Available selection</h1>
+                </div>
+                <span class="selection-instruction">ENTER THE CODE ON THE KEYPAD</span>
+            </div>
+
+            <div class="product-shelves">
+                {% for category in categories %}
+                <section class="shelf-section" aria-label="{{ category.name }}">
+                    <div class="shelf-label">
+                        <h2>{{ category.name }}</h2>
+                        <span>{{ category.products|length|stringformat:"02d" }} ITEMS</span>
+                    </div>
+                    <div class="shelf-grid">
+                        {% for product in category.products %}
+                        <article class="shelf-product{% if product.quantity == 0 %} sold-out{% endif %}"
+                                 data-product="{{ product.product_id }}">
+                            <span class="selection-code">{{ product.product_id }}</span>
+                            <img src="{% static product.image %}" alt="" class="product-thumb">
+                            <div class="product-description">
+                                <span class="product-name">{{ product.name }}</span>
+                                <span class="product-price">Rs {{ product.price_display }}</span>
+                                <span class="product-stock" data-stock-for="{{ product.product_id }}">
+                                    {% if product.quantity == 0 %}SOLD OUT{% else %}{{ product.quantity }} LEFT{% endif %}
+                                </span>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                    <div class="shelf-rail" aria-hidden="true"></div>
+                </section>
+                {% endfor %}
+                <div class="cabinet-footnote">INSERT MONEY &nbsp;·&nbsp; SELECT CODE &nbsp;·&nbsp; COLLECT ITEM</div>
+            </div>
+        </section>
+
+        <aside class="control-panel" aria-label="Vending machine controls">
+            <div class="control-heading">
+                <span class="panel-label">MACHINE CONTROLS</span>
+                <span class="panel-number">UNIT 01</span>
+            </div>
+
+            <section class="credit-panel" aria-label="Current credit">
+                <div class="credit-caption">
+                    <span>CREDIT</span>
+                    <span class="credit-dot" aria-hidden="true"></span>
+                </div>
+                <div class="credit-value" id="credit-value" aria-live="polite">Rs 0.00</div>
+                <div class="balance-row">
+                    <span>REMAINING BALANCE</span>
+                    <span id="balance-value">Rs 0.00</span>
+                </div>
+            </section>
+
+            <section class="control-section money-section" aria-labelledby="money-heading">
+                <div class="section-title">
+                    <span class="step-number">01</span>
+                    <h2 id="money-heading">Insert money</h2>
+                    <span class="accepted-note">MUR</span>
+                </div>
+                <div class="denomination-grid">
+                    {% for denomination, rupees in denomination_buttons %}
+                    <button class="denomination-button" type="button"
+                            data-denomination="{{ denomination }}">
+                        <span>Rs</span>{{ rupees }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="control-section selection-section" aria-labelledby="selection-heading">
+                <div class="section-title">
+                    <span class="step-number">02</span>
+                    <h2 id="selection-heading">Select product</h2>
+                    <span class="accepted-note">CODE</span>
+                </div>
+                <div class="selection-window" aria-live="polite">
+                    <span class="window-caption">SELECTION</span>
+                    <span class="window-code" id="selection-code">--</span>
+                    <span class="window-product" id="selected-product">Enter product code</span>
+                </div>
+                <div class="keypad" aria-label="Numeric keypad">
+                    {% for key in keypad_keys %}
+                    <button class="key-button{% if key == 'clear' %} key-clear{% elif key == 'confirm' %} key-confirm{% endif %}"
+                            type="button" data-key="{{ key }}">
+                        {% if key == "clear" %}CLR{% elif key == "confirm" %}OK{% else %}{{ key }}{% endif %}
+                    </button>
+                    {% endfor %}
+                </div>
+                <label class="quantity-label" for="quantity-input">QUANTITY</label>
+                <input id="quantity-input" class="quantity-input" type="number" min="1" step="1" value="1" inputmode="numeric">
+                <button class="purchase-button" id="purchase-button" type="button" disabled>
+                    DISPENSE SELECTED
+                </button>
+            </section>
+
+            <section class="machine-message" id="machine-message" role="status" aria-live="polite">
+                Welcome. Insert money to begin.
+            </section>
+
+            <section class="change-panel" aria-labelledby="change-heading">
+                <div class="section-title">
+                    <span class="step-number">03</span>
+                    <h2 id="change-heading">Change / return</h2>
+                </div>
+                <div class="change-value" id="change-value">Rs 0.00</div>
+                <div class="change-denominations" id="change-denominations">Change denominations appear here.</div>
+            </section>
+
+            <div class="transaction-actions" id="transaction-actions" hidden>
+                <button type="button" class="continue-button" id="continue-button">CONTINUE</button>
+                <button type="button" class="exit-button" id="exit-button">EXIT / RETURN CHANGE</button>
+            </div>
+            <button type="button" class="next-student-button" id="next-student-button" hidden>
+                START NEXT STUDENT
+            </button>
+        </aside>
+    </main>
+
+    <footer class="machine-footer">
+        <span>MAURITIUS RUPEE &nbsp;·&nbsp; SIMULATION ONLY</span>
+        <span>TRANSACTION RECORDS SAVED TO SQL</span>
+    </footer>
+
+    <form id="csrf-form" hidden>{% csrf_token %}</form>
+    {{ products_data|json_script:"product-data" }}
+    <script>
+        const products = JSON.parse(document.getElementById("product-data").textContent);
+    </script>
+    <script src="{% static 'js/machine.js' %}" defer></script>
+</body>
+</html>

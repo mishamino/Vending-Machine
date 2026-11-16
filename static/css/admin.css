@@ -1,0 +1,448 @@
+:root {
+    --bg: #eceeec;
+    --panel: #f7f8f7;
+    --line: #d5d9d5;
+    --ink: #2b3737;
+    --muted: #6d7775;
+    --accent: #496b62;
+    --accent-soft: #e7f0eb;
+    --warn: #b8745b;
+    --success: #3d7a62;
+    --alert: #ad5d55;
+    --shadow: rgba(38, 49, 47, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+}
+
+button,
+input {
+    font: inherit;
+}
+
+.admin-body {
+    min-height: 100vh;
+}
+
+.admin-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--line);
+    background: #f9faf9;
+}
+
+.tiny-label {
+    margin: 0 0 5px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.admin-topbar h1,
+.admin-login-box h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.admin-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-actions form {
+    margin: 0;
+}
+
+.history-button {
+    display: inline-flex;
+    min-height: 32px;
+    align-items: center;
+    padding: 0 14px;
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    background: transparent;
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+}
+
+.logout-button,
+.primary-button,
+.table-button,
+.admin-login-box button {
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.logout-button {
+    min-height: 32px;
+    padding: 0 14px;
+    font-size: 11px;
+}
+
+.admin-login-shell {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    padding: 24px;
+}
+
+.admin-login-box {
+    width: min(440px, 100%);
+    padding: 24px 22px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel);
+    box-shadow: 0 8px 20px var(--shadow);
+}
+
+.admin-header-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.admin-login-box form {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.admin-login-box label,
+.admin-card label {
+    display: grid;
+    gap: 6px;
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-login-box input,
+.form-grid input,
+.inventory-table-wrap input {
+    width: 100%;
+    min-height: 35px;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: #fff;
+    color: var(--ink);
+}
+
+.admin-login-box button,
+.primary-button {
+    min-height: 38px;
+    padding: 0 14px;
+}
+
+.flash-wrapper {
+    width: min(1200px, calc(100% - 32px));
+    margin: 18px auto 0;
+}
+
+.flash,
+.message {
+    padding: 10px 12px;
+    border-left: 4px solid var(--accent);
+    border-radius: 3px;
+    background: #eef4f0;
+    color: var(--ink);
+    font-size: 13px;
+}
+
+.flash.error,
+.message.error {
+    border-left-color: var(--alert);
+    background: #f8efee;
+    color: #6f2f2d;
+}
+
+.flash.success,
+.message.success {
+    border-left-color: var(--success);
+    background: #edf5ef;
+    color: #2f5e49;
+}
+
+.admin-layout {
+    width: min(1400px, calc(100% - 32px));
+    margin: 24px auto 32px;
+    display: grid;
+    gap: 20px;
+}
+
+.admin-card {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel);
+    box-shadow: 0 4px 14px rgba(43, 55, 55, 0.04);
+}
+
+.add-product-panel {
+    padding: 18px 20px 22px;
+}
+
+.add-product-panel h2,
+.inventory-panel h2 {
+    margin: 0 0 16px;
+    font-size: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.primary-button {
+    margin-top: 16px;
+}
+
+.inventory-panel {
+    padding: 18px 18px 20px;
+}
+
+.transaction-panel {
+    padding: 18px 18px 20px;
+}
+
+.transaction-panel h2 {
+    margin: 0 0 5px;
+    font-size: 20px;
+}
+
+.transaction-table {
+    min-width: 850px;
+}
+
+.transaction-items {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.transaction-items li + li {
+    margin-top: 4px;
+}
+
+.transaction-items span {
+    color: var(--muted);
+}
+
+.transaction-completed {
+    background: #edf5ef;
+    color: var(--success);
+}
+
+.transaction-pending {
+    background: #fff3e9;
+    color: #9d5b1e;
+}
+
+.transaction-pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.transaction-pagination a {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.panel-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.small-text {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.inventory-table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1100px;
+}
+
+th,
+td {
+    border: 1px solid var(--line);
+    padding: 8px 8px;
+    text-align: left;
+    vertical-align: middle;
+    background: #fff;
+    font-size: 12px;
+}
+
+th {
+    background: #f1f4f1;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+td form {
+    display: contents;
+}
+
+.login-box input,
+table input {
+    min-width: 0;
+}
+
+.status {
+    display: inline-block;
+    min-width: 78px;
+    padding: 4px 6px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+.status.in-stock {
+    background: #edfaf1;
+    color: var(--success);
+}
+
+.status.low {
+    background: #fff3e9;
+    color: #9d5b1e;
+}
+
+.status.soldout {
+    background: #f9eeee;
+    color: var(--alert);
+}
+
+.status.discontinued {
+    background: #f1f2f2;
+    color: var(--muted);
+}
+
+.checkbox-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.checkbox-wrap input {
+    width: 16px;
+    min-height: 16px;
+}
+
+.table-button {
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 10px;
+}
+
+.update-btn {
+    background: var(--accent);
+}
+
+.restock-btn {
+    background: #6a807b;
+    border-color: #6a807b;
+}
+
+.delete-btn {
+    background: #924f46;
+    border-color: #924f46;
+}
+
+.restock-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.restock-box input {
+    width: 80px;
+}
+
+.message-list {
+    margin: 12px 0 0;
+    padding-left: 18px;
+}
+
+@media (max-width: 980px) {
+    .form-grid {
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .admin-topbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-actions {
+        flex-wrap: wrap;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-layout {
+        width: min(100% - 20px, 1400px);
+    }
+
+    .admin-card {
+        padding: 14px 12px;
+    }
+
+    .inventory-table-wrap {
+        margin: 0 -12px;
+    }
+}
