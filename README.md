@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Ebene Campus Vending Machine - Django
 
 This is a Django web application that simulates the physical vending machine
@@ -88,7 +88,7 @@ The primary learning reference is the
 [W3Schools Django tutorial](https://www.w3schools.com/django/). Read its
 project/app, views, URLs, templates, models, and CRUD lessons, then follow a
 request through this project's URL, view, model, and template or JSON response.
-=======
+
 # Vending-Machine
 A Django-based vending machine web application with SQL database integration, payment processing, and denomination tracking.
->>>>>>> b55ac273f724964844e54ce66f8e0c94a9809c92
+
